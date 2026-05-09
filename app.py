@@ -85,6 +85,12 @@ if st.button("Analizar poema"):
                 - responde solamente:
                 "El texto ingresado no parece ser un poema."
 
+                Reglas IMPORTANTES:
+                - NO analices saludos, frases cortas o palabras aisladas.
+                - NO analices letras de reggaetón, trap, canciones comerciales o frases virales.
+                - Si el texto no parece un poema literario auténtico, responde SOLO:
+                "El texto ingresado no parece ser un poema literario."
+
                 Si SÍ es un poema:
                 analiza y genera:
 
