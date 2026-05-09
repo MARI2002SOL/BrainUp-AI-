@@ -79,9 +79,14 @@ if st.button("Analizar poema"):
             try:
 
                 prompt = f"""
-                Eres un experto en literatura y poesía en español.
+                Primero determina si el siguiente texto es realmente un poema en español.
 
-                Analiza el siguiente poema y genera:
+                Si NO es un poema:
+                - responde solamente:
+                "El texto ingresado no parece ser un poema."
+
+                Si SÍ es un poema:
+                analiza y genera:
 
                 1. Tema principal
                 2. Emociones transmitidas
@@ -90,9 +95,7 @@ if st.button("Analizar poema"):
                 5. Interpretación del significado
                 6. Explicación sencilla para estudiantes
 
-                Sé claro, organizado y profundo.
-
-                POEMA:
+                Texto:
                 {poema}
                 """
 
