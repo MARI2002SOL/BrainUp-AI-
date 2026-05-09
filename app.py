@@ -1,151 +1,126 @@
 import streamlit as st
 import google.generativeai as genai
-from PyPDF2 import PdfReader
 from pymongo import MongoClient
-from dotenv import load_dotenv
-import os
 
 # =========================
-# LOAD ENV VARIABLES
+# CONFIG
 # =========================
 
 GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 MONGODB_URI = st.secrets["MONGODB_URI"]
+
 # =========================
-# GEMINI CONFIG
+# GEMINI
 # =========================
 
 genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash"
+    model_name="gemini-1.5-flash"
 )
 
 # =========================
-# MONGODB CONFIG
+# MONGODB
 # =========================
 
 client = MongoClient(MONGODB_URI)
 
-db = client["scientific_papers"]
+db = client["poetry_ai"]
 
-collection = db["summaries"]
+collection = db["analyses"]
 
 # =========================
 # STREAMLIT UI
 # =========================
 
 st.set_page_config(
-    page_title="AI Scientific Paper Summarizer",
-    page_icon="📚",
+    page_title="Analizador de Poemas IA",
+    page_icon="📜",
     layout="wide"
 )
 
-st.title("📚 AI Scientific Paper Summarizer")
+st.title("📜 Analizador de Poemas con IA")
 
 st.markdown("""
-Upload a scientific paper in PDF format and Gemini AI will generate:
+Escribe o pega un poema en español y la IA analizará:
 
-- General Summary
-- Main Objective
-- Methodology
-- Key Results
-- Limitations
-- Conclusions
-- Simple Explanation
+- Tema principal
+- Emociones
+- Recursos literarios
+- Significado
+- Tono del poema
+- Interpretación sencilla
 """)
 
 # =========================
-# FILE UPLOAD
+# INPUT
 # =========================
 
-uploaded_file = st.file_uploader(
-    "Upload your scientific paper",
-    type=["pdf"]
+poema = st.text_area(
+    "✍️ Escribe tu poema aquí",
+    height=300,
+    placeholder="Ejemplo:\n\nPuedo escribir los versos más tristes esta noche..."
 )
 
 # =========================
-# PROCESS PDF
+# ANALYZE BUTTON
 # =========================
 
-if uploaded_file is not None:
+if st.button("Analizar poema"):
 
-    st.success("PDF uploaded successfully ✅")
+    if not poema.strip():
 
-    # Extract text from PDF
-    reader = PdfReader(uploaded_file)
+        st.warning("⚠️ Por favor escribe un poema.")
 
-    paper_text = ""
+    else:
 
-    for page in reader.pages:
-
-        text = page.extract_text()
-
-        if text:
-            paper_text += text
-
-    # Show extracted text size
-    st.info(f"Extracted {len(paper_text)} characters from PDF")
-
-    # =========================
-    # GENERATE SUMMARY BUTTON
-    # =========================
-
-    if st.button("Generate AI Summary"):
-
-        with st.spinner("Gemini is analyzing the paper..."):
+        with st.spinner("Analizando poema..."):
 
             try:
 
-                # Limit text size
-                limited_text = paper_text[:15000]
-
-                # Prompt
                 prompt = f"""
-                You are an expert scientific research assistant.
+                Eres un experto en literatura y poesía en español.
 
-                Analyze the following scientific article and generate:
+                Analiza el siguiente poema y genera:
 
-                1. General Summary
-                2. Main Objective
-                3. Methodology
-                4. Key Results
-                5. Limitations
-                6. Conclusions
-                7. Simple Explanation for students
+                1. Tema principal
+                2. Emociones transmitidas
+                3. Tono del poema
+                4. Recursos literarios utilizados
+                5. Interpretación del significado
+                6. Explicación sencilla para estudiantes
 
-                Make the response clear and well structured.
+                Sé claro, organizado y profundo.
 
-                ARTICLE:
-                {limited_text}
+                POEMA:
+                {poema}
                 """
 
-                # Gemini response
                 response = model.generate_content(prompt)
 
-                summary = response.text
+                analisis = response.text
 
                 # =========================
-                # DISPLAY RESULTS
+                # SHOW RESULTS
                 # =========================
 
-                st.subheader("📄 AI Summary")
+                st.subheader("📖 Análisis del poema")
 
-                st.write(summary)
+                st.write(analisis)
 
                 # =========================
                 # SAVE TO MONGODB
                 # =========================
 
                 document = {
-                    "filename": uploaded_file.name,
-                    "summary": summary
+                    "poema": poema,
+                    "analisis": analisis
                 }
 
                 collection.insert_one(document)
 
-                st.success("Summary saved to MongoDB ✅")
+                st.success("✅ Análisis guardado en MongoDB")
 
             except Exception as e:
 
-                st.error(f"Error: {str(e)}")
+                st.error(f"⚠️ Error: {str(e)}")
