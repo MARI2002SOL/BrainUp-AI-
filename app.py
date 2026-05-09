@@ -3,6 +3,84 @@ import google.generativeai as genai
 from pymongo import MongoClient
 
 # =========================
+# PAGE CONFIG
+# =========================
+
+st.set_page_config(
+    page_title="Analizador de Poemas IA",
+    page_icon="📜",
+    layout="wide"
+)
+
+# =========================
+# CUSTOM CSS
+# =========================
+
+st.markdown("""
+<style>
+
+.main {
+    background-color: #0f1117;
+}
+
+h1 {
+    text-align: center;
+    color: #f5f5f5;
+    font-size: 3rem;
+}
+
+.subtitle {
+    text-align: center;
+    color: #b0b0b0;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.stTextArea textarea {
+    background-color: #1c1f26;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid #444;
+    font-size: 16px;
+    padding: 15px;
+}
+
+.stButton button {
+    width: 100%;
+    background: linear-gradient(90deg, #7F5AF0, #2CB67D);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    height: 3em;
+    font-size: 18px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.stButton button:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+.result-box {
+    background-color: #1c1f26;
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid #333;
+    margin-top: 20px;
+}
+
+.footer {
+    text-align: center;
+    color: gray;
+    margin-top: 50px;
+    font-size: 0.9rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # CONFIG
 # =========================
 
@@ -30,27 +108,16 @@ db = client["poetry_ai"]
 collection = db["analyses"]
 
 # =========================
-# STREAMLIT UI
+# HEADER
 # =========================
 
-st.set_page_config(
-    page_title="Analizador de Poemas IA",
-    page_icon="📜",
-    layout="wide"
-)
-
-st.title("📜 Analizador de Poemas con IA")
+st.markdown("<h1>📜 Analizador de Poemas con IA</h1>", unsafe_allow_html=True)
 
 st.markdown("""
-Escribe o pega un poema en español y la IA analizará:
-
-- Tema principal
-- Emociones
-- Recursos literarios
-- Significado
-- Tono del poema
-- Interpretación sencilla
-""")
+<div class="subtitle">
+Descubre el significado oculto, emociones y recursos literarios de cualquier poema en español ✨
+</div>
+""", unsafe_allow_html=True)
 
 # =========================
 # INPUT
@@ -59,14 +126,16 @@ Escribe o pega un poema en español y la IA analizará:
 poema = st.text_area(
     "✍️ Escribe tu poema aquí",
     height=300,
-    placeholder="Ejemplo:\n\nPuedo escribir los versos más tristes esta noche..."
+    placeholder="""
+Puedo escribir los versos más tristes esta noche...
+"""
 )
 
 # =========================
-# ANALYZE BUTTON
+# BUTTON
 # =========================
 
-if st.button("Analizar poema"):
+if st.button("✨ Analizar poema"):
 
     if not poema.strip():
 
@@ -110,12 +179,18 @@ if st.button("Analizar poema"):
                 analisis = response.text
 
                 # =========================
-                # SHOW RESULTS
+                # RESULTS
                 # =========================
+
+                st.markdown("""
+                <div class="result-box">
+                """, unsafe_allow_html=True)
 
                 st.subheader("📖 Análisis del poema")
 
                 st.write(analisis)
+
+                st.markdown("</div>", unsafe_allow_html=True)
 
                 # =========================
                 # SAVE TO MONGODB
@@ -133,3 +208,7 @@ if st.button("Analizar poema"):
             except Exception as e:
 
                 st.error(f"⚠️ Error: {str(e)}")
+
+# =========================
+# FOOTER
+# =========================
