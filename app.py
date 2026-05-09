@@ -16,7 +16,7 @@ MONGODB_URI = st.secrets["MONGODB_URI"]
 genai.configure(api_key=GEMINI_API_KEY)
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash"
+    model_name="gemini-2.0-flash"
 )
 
 # =========================
